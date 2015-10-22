@@ -90,10 +90,10 @@
         
         NSLog(@"input mySt:%@", args[0]);
         _imgIndex = [[NSString alloc]initWithFormat:@"%@",args[0]];
-        [self editImageComponent:_fullPath :_imgIndex];
+        //[self editImageComponent:_fullPath :_imgIndex];
         //        [self editImageComponent: @"/Users/linlecui/Desktop/10c58PIC2CK_1024.jpg" : imgIndex];//加载本地图片到webview,把图片的索引传给方法
         [self backgroundClick];
-        [self getHtmlCodeClick];
+        
         NSLog(@"-------End Image-------");
     };
     
@@ -146,6 +146,7 @@
     
     NSLog(@"final javascript:%@",str);
     [_webView stringByEvaluatingJavaScriptFromString:str];//js字符串通过这个方法传递到webview中的html并执行此js
+     [self getHtmlCodeClick];
 }
 //选择图片
 -(void)backgroundClick
@@ -179,12 +180,13 @@
     
     _fullPath = [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:imageName];
     NSLog(@"%@",_fullPath);
-    [self loadHtmlToWebView];
+//    [self loadHtmlToWebView];
    
      // 将图片写入文件
     [imageData writeToFile:_fullPath atomically:NO];
-    NSArray *args = [JSContext currentArguments];
-    _imgIndex = [[NSString alloc]initWithFormat:@"%@",args[0]];
+    
+   
+     NSLog(@"_imgIndex_imgIndex:::%@",_imgIndex);
     [self editImageComponent:_fullPath :_imgIndex];
 }
 #pragma mark - image picker delegte
