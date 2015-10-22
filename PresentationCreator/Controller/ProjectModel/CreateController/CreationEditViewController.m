@@ -14,6 +14,7 @@
 #import "PreviewViewController.h"
 #import "EditNowViewController.h"
 
+
 @interface CreationEditViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UIActionSheetDelegate,UIWebViewDelegate>
 @property (nonatomic, retain) UIView *backgorundView;
 @property (nonatomic, strong) UICollectionView*collectionView;
