@@ -15,9 +15,9 @@
 #import "EditNowViewController.h"
 
 
-@interface CreationEditViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UIActionSheetDelegate,UIWebViewDelegate>
+@interface CreationEditViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIImagePickerControllerDelegate,UIActionSheetDelegate,UIWebViewDelegate, UITextViewDelegate>
 @property (nonatomic, retain) UIView *backgorundView;
-@property (nonatomic, strong) UICollectionView*collectionView;
+@property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIView *footerView;
 @property (nonatomic, retain) UIImageView *imageView;
 @property (nonatomic, retain) NSMutableArray *htmeArray;
@@ -32,6 +32,10 @@
 @property (nonatomic, strong) NSString *maxSummaryIdStr;//取summary表中最大的主键值
 @property (nonatomic, strong) NSString *summaryNameStr;
 @property (nonatomic, strong) NSString *returnTempleIdStr;
+
+@property (nonatomic, strong) UIControl *titleViewControl;
+@property (nonatomic, strong) UITextView *titleTextView;
+
 @end
 
 @implementation CreationEditViewController
@@ -80,32 +84,55 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(collectionCellAdd:) name:@"EditNotification" object:nil];
     self.view.backgroundColor = [UIColor blackColor];
     [self addNavigation];
+    [self addCollectionView];
     [self addClick];
     //    [self addFooter];
-    [self addCollectionView];
+    
     _fullPath = [[NSString alloc]init];
 }
 -(void)addClick
 {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Please type your presentation name" message:@"" preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField){
-        
-        textField.placeholder = @"Presentation Name";
-        //        textField.text = @"起一个名字";
-    }];
-    //    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+    _titleViewControl = [[UIControl alloc]initWithFrame:CGRectMake(0, 64, self.view.bounds.size.width, self.view.bounds.size.height-64)];
+    _titleViewControl.backgroundColor = [UIColor grayColor];
     
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        
-        NSLog(@"%@",alertController.textFields.firstObject.text);
-        self.summaryNameStr = alertController.textFields.firstObject.text;
-        self.maxSummaryIdStr = [DBDaoHelper insertSummaryWithName:alertController.textFields.firstObject.text];
-    }];
+    UILabel *titleLabel = [[UILabel alloc]init];
+    titleLabel.frame = CGRectMake(20, 20, KScreenWidth, 30);
+    titleLabel.text = @"Presentation name:";
+    [_titleViewControl addSubview:titleLabel];
     
-    //    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
+    _titleTextView = [[UITextView alloc]init];
+    _titleTextView.frame = CGRectMake(20, 50, KScreenWidth-40, KScreenHeight*0.25);
+    _titleTextView.delegate = self;
+    _titleTextView.backgroundColor = [UIColor whiteColor];
+   // [_titleTextView setText: @"aa"];
+    [_titleTextView becomeFirstResponder];
+    [_titleViewControl addSubview:_titleTextView];
     
-    [self presentViewController:alertController animated:YES completion:nil];
+    // 点击OK按钮，保存到summary表中，并返回最大的主键。
+    UIButton *okButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    okButton.frame = CGRectMake(20 , 30 + KScreenHeight*0.25 + 40, KScreenWidth-40, 40);
+    [okButton setTitle:@"OK" forState:UIControlStateNormal];
+    [okButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    okButton.backgroundColor = [UIColor darkGrayColor];
+    okButton.titleLabel.font = [UIFont systemFontOfSize:18.0];
+    [okButton.layer setMasksToBounds:YES];
+    
+    [okButton.layer setBorderWidth:1.0];
+    [okButton.layer setCornerRadius:7.0];
+    okButton.layer.borderColor = [UIColor whiteColor].CGColor;
+    [_titleViewControl addSubview:okButton];
+
+    [okButton addTarget:self action:@selector(saveSummaryTile) forControlEvents:UIControlEventTouchUpInside];
+   
+    [self.view addSubview:_titleViewControl];
+    [self.view bringSubviewToFront:_titleViewControl];
+
+}
+-(void)saveSummaryTile{
+    self.summaryNameStr = _titleTextView.text;
+    self.maxSummaryIdStr = [DBDaoHelper insertSummaryWithName:_titleTextView.text];
+    [_titleViewControl removeFromSuperview ];
+    _titleViewControl = nil;
 }
 -(void)addNavigation
 {
